@@ -98,7 +98,46 @@ AWS, Jenkins, Docker, Linux, Git, Java, Maven, Docker Hub
   ```
   ![Diagram](./images/aws-pipeline-4.png)
 
+  In the EC2 instance terminal, you can see that the Docker Compose file was successfully copied from the repository, and it started the Java app and Postgres containers.
+
+- Extract shell script
+
+  It is also possible to use a shell script to separate all the commands that will be used to run the pipeline into a single file:
   
+  ```
+    #!/usr/bin/env bash
+
+    export IMAGE=$1
+    docker-compose -f docker-compose.yaml up --detach
+    echo "success"
+  ```
+  As with the Docker Compose file, this shell script needs to be transferred to the EC2 instance to be executed by Jenkins:
+  
+  ```
+    sh "scp server-cmds.sh ec2-user@54.211.179.187:/home/ec2-user"
+  ```
+  
+  The containers from the previous steps were stopped using the docker-compose down command before running this pipeline.
+
+  ![Diagram](./images/aws-pipeline-5.png)
+  
+  The pipeline logs show that the SCP commands were executed correctly.
+
+- New build version
+
+  Another improvement in the project is to dynamically set the Docker image pulled from the repository. Previously, the image was hard-coded in the Docker Compose file, but it is now          possible to use the latest version. This can be done by following these steps:
+
+  - The Jenkinsfile sends the variable to the shell script via parameter: "bash ./server-cmds.sh ${IMAGE_NAME}"
+  - The script receives the parameter and exports it to be used by Docker Compose: export IMAGE=$1
+  - Docker Compose can now use the parameter for the application image:
+    
+  ```
+    java-mvane-app:
+      image: ${IMAGE}
+      ports: 
+        - 8080:8080
+  ```
+  ![Diagram](./images/aws-pipeline-6.png)
 
   
   
