@@ -47,4 +47,59 @@ AWS, Jenkins, Docker, Linux, Git, Java, Maven, Docker Hub
 - Complete pipeline
 
   In this phase of the project, a complete pipeline was executed, including the build, jar, image, and deploy stages. These stages were configured in the jenkins-jobs branch, which also uses the shared library created in the Jenkins module. Additionally, a new environment variable was added to the pipeline:
+
+  ```
+    environment {
+        IMAGE_NAME = 'mauriciocamilo/demo-app:java-maven-1.0'
+    }
+  ```
+  ![Diagram](./images/aws-pipeline-3.png)
+
+  The image above shows that the java-maven app image was created and is running on port 8080. The image created in the previous section is also displayed here.
+
+# Demo Project 3
+
+CD - Deploy Application from Jenkins Pipeline on EC2 Instance (automatically with docker-compose)
+
+## Technologies Used
+
+AWS, Jenkins, Docker, Linux, Git, Java, Maven, Docker Hub
+
+## Project Description
+
+- Install Docker Compose on AWS EC2 Instance
+- Create docker-compose.yml file that deploys our web application image
+- Configure Jenkins pipeline to deploy newly built image using Docker Compose on EC2 server
+- Improvement: Extract multiple Linux commands that are executed on remote server into a separate shell script and execute the script from Jenkinsfile
+
+### Details of project
+
+- Install docker-compose in EC2
+
+  The goal of this project is to achieve the same result as the last one but using Docker Compose on the EC2 instance. The first step was to install Docker Compose on the instance using the    following commands, which download the latest version and grant the user permission to run the binary:
+  
+  ```
+    sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose 
+  ```
+  ```
+    sudo chmod +x /usr/local/bin/docker-compose
+  ```
+- Configure docker-compose file in jenkins-jobs branch
+
+  The docker-compose.yaml file was configured to run the application from Docker Hub and create a Postgres image. This file was created locally but needs to be transferred to the instance      before running Docker Compose. Jenkins will handle this transfer using the following command:
+
+  ```
+    sh "scp docker-compose.yaml ec2-user@54.211.179.187:/home/ec2-user" 
+  ```
+  The Docker Compose command was configured similarly to the docker run command, inside the SSH command, using a variable:
+  
+  ```
+    def dockerComposeCmd = "docker-compose -f docker-compose.yaml up --detach"
+  ```
+  ![Diagram](./images/aws-pipeline-4.png)
+
+  
+
+  
+  
   
