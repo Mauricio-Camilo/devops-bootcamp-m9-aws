@@ -157,7 +157,7 @@ AWS, Jenkins, Docker, Linux, Git, Java, Maven, Docker Hub
 
 ### Details of project
 
-To complete all the pipeline steps covered so far, Docker image dynamic versioning was implemented using the stages configured in the previous projects. These stages include version increment and commit version update.
+To complete all the pipeline steps covered so far, Docker image dynamic versioning was implemented using the stages configured in the previous projects. These stages include version increment and commit version update. The final version of the code is in Jenkinsfile in jenkins-jobs branch, and the Shared LIbrary is in the following url: https://github.com/Mauricio-Camilo/jenkins-shared-library
 
 ![Diagram](./images/aws-pipeline-7.png)
 
