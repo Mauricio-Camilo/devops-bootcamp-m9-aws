@@ -139,6 +139,29 @@ AWS, Jenkins, Docker, Linux, Git, Java, Maven, Docker Hub
   ```
   ![Diagram](./images/aws-pipeline-6.png)
 
+# Demo Project 4
+
+Complete the CI/CD Pipeline (Docker-Compose, Dynamic versioning)
+
+## Technologies Used
+
+AWS, Jenkins, Docker, Linux, Git, Java, Maven, Docker Hub
+
+## Project Description
+
+- CI step: Increment version
+- CI step: Build artifact for Java Maven application
+- CI step: Build and push Docker image to Docker Hub
+- CD step: Deploy new application version with Docker Compose
+- CD step: Commit the version update
+
+### Details of project
+
+To complete all the pipeline steps covered so far, Docker image dynamic versioning was implemented using the stages configured in the previous projects. These stages include version increment and commit version update.
+
+![Diagram](./images/aws-pipeline-7.png)
+
+
   
   
   
