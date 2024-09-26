@@ -161,7 +161,7 @@ To complete all the pipeline steps covered so far, Docker image dynamic versioni
 
 ![Diagram](./images/aws-pipeline-7.png)
 
-# Demo Project 4
+# Demo Project 5
 
 Interacting with AWS CLI
 
@@ -183,6 +183,8 @@ AWS, Linux
 
   Once the AWS CLI is installed, a configuration was done to ensure it has access to the correct AWS account where resources will be created. This is accomplished using the aws configure command, which will accept the access credentials of the admin user created via the AWS Management Console. It will also specify the region where the resources are to be created and the desired output format.
 
+  ![Diagram](./images/aws-cli-1.png)
+
 - Creating a Security Group
 
   To create a security group, the following command was used:
@@ -190,6 +192,8 @@ AWS, Linux
   ```
     aws ec2 create-security-group --group-name my-sg --description "My Security Group" --vpc-id vpc-0dc9f59d476fade23
   ```
+  ![Diagram](./images/aws-cli-2.png)
+
   Next, we need to set up an inbound rule for the security group, that only allows connection to the port 22 using my IP address:
 
   ```
@@ -199,6 +203,8 @@ AWS, Linux
     --port 22 \
     --cidr 177.140.106.206/32
   ```
+  ![Diagram](./images/aws-cli-3.png)
+
 - Creating a Key Pair
 
   To create a key pair, the following command was used, which includes settings to decrypt the key value and save it in a .pem file:
@@ -209,6 +215,8 @@ AWS, Linux
     --query 'KeyMaterial' \
     --output text > MyKpCli.pem
   ```  
+  ![Diagram](./images/aws-cli-4.png)
+
 - Lauch an EC2 Instance
 
   It was utilized some information from the previously created resources to launch the EC2 instance, and also other information like the image-id and one the subnet ids from the vpc:
@@ -222,7 +230,12 @@ AWS, Linux
     --security-group-ids sg-0091bb19be1b9d9ab \
     --subnet-id subnet-0041332b4863a8819
   ```  
+  ![Diagram](./images/aws-cli-5.png)
+
   The instance has been created successfully, and we can now connect to it using the key generated via the CLI.
+
+  ![Diagram](./images/aws-cli-6.png)
+
 
 - Using Describe Commands with Filters and Queries
 
@@ -242,6 +255,7 @@ AWS, Linux
 
     aws iam add-user-to-group --user-name MyUserCli --group-name MyGroupCli
   ```  
+  ![Diagram](./images/aws-cli-7.png)
 
 - Creating Permissions and Adding Them to the Group
 
@@ -256,6 +270,8 @@ AWS, Linux
   ```
     aws iam list-attached-group-policies --group-name MyGroupCli
   ```  
+  ![Diagram](./images/aws-cli-8.png)
+
 - Creating Credentials for the User
 
   To create a password for the user, use the following command:
@@ -263,6 +279,8 @@ AWS, Linux
   ```
     aws iam create-login-profile --user-name MyUserCli --password MyPassword123! --password-reset-required
   ``` 
+  ![Diagram](./images/aws-cli-9.png)
+
   This allows the user to log in with a new password, although it will not yet have permission to change it. 
   To solve it, A JSON file containing the password change policy should be created and attached to the user
 
@@ -297,11 +315,15 @@ AWS, Linux
   ```
     aws iam attach-group-policy --group-name MyGroupCli --policy-arn arn:aws:iam::808826729764:policy/changePwd  
   ```    
+  ![Diagram](./images/aws-cli-10.png)
+
   To create an access key for the user:
 
   ```
     aws iam create-access-key --user-name MyUserCli
   ```  
+  ![Diagram](./images/aws-cli-11.png)
+
   These new credentials can be used in the CLI to execute the commands, as it is done with the admin user.
 
 - Changing Users Using Environment Variables
@@ -315,6 +337,9 @@ AWS, Linux
   This will create a context for the AWS CLI without deleting saved credentials. It is also possible to change the default region.
 
   This new user can access the CLI, but keep in mind that they won’t have all the privileges of the admin user, such as the ability to create new users.
+
+  ![Diagram](./images/aws-cli-12.png)
+
 
 
 
