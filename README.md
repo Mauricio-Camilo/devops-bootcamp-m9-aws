@@ -161,7 +161,163 @@ To complete all the pipeline steps covered so far, Docker image dynamic versioni
 
 ![Diagram](./images/aws-pipeline-7.png)
 
+# Demo Project 4
+
+Interacting with AWS CLI
+
+## Technologies Used
+
+AWS, Linux
+
+## Project Description
+
+- Install and configure AWS CLI tool to connect to our AWS account
+- Create EC2 Instance using the AWS CLI with all necessary configurations like Security Group
+- Create SSH key pair
+- Create IAM resources like User, Group, Policy using the AWS CLI
+- List and browse AWS resources using the AWS CLI
+
+### Details of project
+
+- Installing AWS CLI and Configuring with an Account
+
+  Once the AWS CLI is installed, a configuration was done to ensure it has access to the correct AWS account where resources will be created. This is accomplished using the aws configure command, which will accept the access credentials of the admin user created via the AWS Management Console. It will also specify the region where the resources are to be created and the desired output format.
+
+- Creating a Security Group
+
+  To create a security group, the following command was used:
+
+  ```
+    aws ec2 create-security-group --group-name my-sg --description "My Security Group" --vpc-id vpc-0dc9f59d476fade23
+  ```
+  Next, we need to set up an inbound rule for the security group, that only allows connection to the port 22 using my IP address:
+
+  ```
+    aws ec2 authorize-security-group-ingress \
+    --group-id sg-0091bb19be1b9d9ab \
+    --protocol tcp \
+    --port 22 \
+    --cidr 177.140.106.206/32
+  ```
+- Creating a Key Pair
+
+  To create a key pair, the following command was used, which includes settings to decrypt the key value and save it in a .pem file:
+
+  ```
+    aws ec2 create-key-pair \
+    --key-name MyKpCli \
+    --query 'KeyMaterial' \
+    --output text > MyKpCli.pem
+  ```  
+- Lauch an EC2 Instance
+
+  It was utilized some information from the previously created resources to launch the EC2 instance, and also other information like the image-id and one the subnet ids from the vpc:
+
+  ```
+    aws ec2 run-instances \
+    --image-id ami-0ebfd941bbafe70c6 \
+    --count 1 \
+    --instance-type t2.micro \
+    --key-name MyKpCli \
+    --security-group-ids sg-0091bb19be1b9d9ab \
+    --subnet-id subnet-0041332b4863a8819
+  ```  
+  The instance has been created successfully, and we can now connect to it using the key generated via the CLI.
+
+- Using Describe Commands with Filters and Queries
+
+  When using describe commands, some filters and queries can be applied to refine the searches. Filters select specific components, while queries retrieve attributes of those components. For example, the following command lists only t2.micro instance IDs:
+  
+  ```
+    aws ec2 describe-instances --filters "Name=instance-type,Values=t2.micro" --query "Reservations[].Instances[].InstanceId"
+  ```  
+- Creating a Group and User and Associating Them
+
+  A group and user can be created and associeated, as follows:
+
+  ```
+    aws iam create-group --group-name MyGroupCli 
+
+    aws iam create-user --user-name MyUserCli
+
+    aws iam add-user-to-group --user-name MyUserCli --group-name MyGroupCli
+  ```  
+
+- Creating Permissions and Adding Them to the Group
+
+  Next, permissions will be attached to the group, which will apply to all users in that group. To provide full access to EC2 services, the following ARN found in the AWS Management Console can be used:
+
+  ```
+    aws iam attach-group-policy --group-name MyGroupCli --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
+  ```  
+
+  To validate that the group contains this policy:
+
+  ```
+    aws iam list-attached-group-policies --group-name MyGroupCli
+  ```  
+- Creating Credentials for the User
+
+  To create a password for the user, use the following command:
+
+  ```
+    aws iam create-login-profile --user-name MyUserCli --password MyPassword123! --password-reset-required
+  ``` 
+  This allows the user to log in with a new password, although it will not yet have permission to change it. 
+  To solve it, A JSON file containing the password change policy should be created and attached to the user
+
+  ```
+    {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+            	"iam:ChangePassword",
+            ]
+            "Resource": [
+            	"arn:aws:iam::808826729764:user/MyUserCli"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+            	"iam:GetAccountPasswordPolicy",
+            ]
+            "Resource": "*"
+        }
+      ]
+    } 
+  ``` 
+
+  ```
+    aws iam create-policy --policy-name changePwd --policy-document file://changePwdPolicy.json
+  ```  
+
+  ```
+    aws iam attach-group-policy --group-name MyGroupCli --policy-arn arn:aws:iam::808826729764:policy/changePwd  
+  ```    
+  To create an access key for the user:
+
+  ```
+    aws iam create-access-key --user-name MyUserCli
+  ```  
+  These new credentials can be used in the CLI to execute the commands, as it is done with the admin user.
+
+- Changing Users Using Environment Variables
+
+  An alternate method can be used to change the user only in the context that the commands are executed:
+
+  ```
+    export AWS_ACCESS_KEY_ID=<value>
+    export AWS_SECRET_ACCESS_KEY=<value>
+  ``` 
+  This will create a context for the AWS CLI without deleting saved credentials. It is also possible to change the default region.
+
+  This new user can access the CLI, but keep in mind that they won’t have all the privileges of the admin user, such as the ability to create new users.
+
+
 
   
-  
-  
+
+
