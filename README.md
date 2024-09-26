@@ -1,3 +1,83 @@
+# Demo Project 1
+
+Deploy Web Application on EC2 Instance (manually)
+
+## Technologies Used
+
+AWS, Docker, Linux
+
+## Project Description
+
+- Create and configure an EC2 Instance on AWS
+- Install Docker on remote EC2 Instance
+- Deploy Docker image from private Docker repository on EC2 Instance
+
+### Details of project
+
+- Creating an EC2 Instance
+
+  An instance was launched in aws EC2 dashboard with the following specifications:
+
+    - Amazon Linux image
+    - Instance Type: t2.micro
+    - Key Pair: Select "docker-server." The public key is already in the instance; you will need  to download the private key.
+    - VPC and Subnet: Use the default settings.
+    - Enable Public IP Address.
+    - Create a new Security Group: Allow port 22 (SSH) and restrict access to my IP only.
+    - Storage: Use default settings.
+
+  To connect to the EC2 instance, the SSH key was moved to the .ssh directory and changed its permissions, and then connect to it, using the instance public IP, and a user named ec2-user:    
+
+  ```
+    chmod 400 ~/.ssh/docker-server.pem
+  ```
+
+  ```
+    ssh -i ~/.ssh/docker-server.pem ec2-user@54.211.179.187
+  ```
+  ![Diagram](./images/aws-ec2-1.png)
+
+- Installing Docker on the Instance
+
+  The following commands were used to install docker:
+
+  ```
+    sudo yum update
+  ```
+
+  Install Docker:
+
+  ```
+    sudo yum install docker
+  ```
+
+  Start the Docker service:
+
+  ```
+    sudo service docker start
+  ```
+
+  Add the ec2-user to the Docker group: (Log out and log back in to validate the change.)
+
+  ```
+    sudo usermod -aG docker $USER
+  ```
+- Running the Application on EC2
+
+  The provided application repository was clonned and push to Docker Hub. Before this action, docker login was executed in the instance, to allow the connection with Docker Hub.
+
+  ```
+    docker pull mauriciocamilo/demo-app:1.0
+  ```
+  This image was runned with port binding on port 3000:
+
+  ```
+    docker run -d -p 3000:3080 mauriciocamilo/demo-app:1.0
+  ```
+  It was ensured that port 3000 is allowed in the security group to access the application through a browser.
+
+  ![Diagram](./images/aws-ec2-2.png)
+
 # Demo Project 2
 
 CD - Deploy Application from Jenkins Pipeline to EC2 Instance (automatically with docker)
